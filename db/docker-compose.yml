@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:latest  # Используем официальный образ PostgreSQL
+    restart: always
+    environment:
+      POSTGRES_DB: cinema_db
+      POSTGRES_USER: cinema_user
+      POSTGRES_PASSWORD: cinema_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Храним данные даже после перезапуска контейнера
+
+volumes:
+  postgres_data:
