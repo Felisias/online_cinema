@@ -12,4 +12,12 @@ services:
     ports:
       - "5438:5432"
     volumes:
-      - /GitHub/online_cinema/database:/var/lib/postgresql/data  # Храним данные даже после перезапуска контейнера
+      - cinema_volume:/var/lib/postgresql/data  # Храним данные даже после перезапуска контейнера
+volumes:
+  cinema_volume:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: 'D:/GitHub/online_cinema/database'
+
