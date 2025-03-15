@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'cinema',
+    'rest_framework',
 ]
 
 AUTH_USER_MODEL = 'cinema.User'

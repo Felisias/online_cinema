@@ -17,6 +17,27 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+
+from django.contrib import admin
+from django.urls import path, include
+
+
+#from online_cinema.backend_base.myproject.cinema.views import FilmListView, FilmCreateView
+###from myproject.cinema.views import FilmListView, FilmCreateView
+#from .views import FilmListView, FilmCreateView
+
+
+#from .views import add_movie
+
+#urlpatterns = [
+#    path('api/movies/add/', add_movie),
+#]
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+###    path('cinema/', FilmListView.as_view(), name='film_list'),  # GET запрос
+###    path('cinema/create/', FilmCreateView.as_view(), name='film_create'),  # POST запрос
+
+    path('api/', include('cinema.urls')),
 ]
