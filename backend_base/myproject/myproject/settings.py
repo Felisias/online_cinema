@@ -27,8 +27,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-#AUTH_USER_MODEL = 'cinema.User'
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -41,6 +39,10 @@ INSTALLED_APPS = [
 
     'cinema',
 ]
+
+AUTH_USER_MODEL = 'cinema.User'
+
+#AUTH_USER_MODEL = 'cinema.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
