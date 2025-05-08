@@ -1,43 +1,24 @@
-"""
-URL configuration for myproject project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.1/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-from django.contrib import admin
-from django.urls import path
-
-
-from django.contrib import admin
 from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import (
+    UserViewSet,
+    GenreViewSet,
+    ContentViewSet,
+    MovieViewSet,
+    SeriesViewSet,
+    SeasonViewSet,
+    EpisodeViewSet
+)
 
-
-#from online_cinema.backend_base.myproject.cinema.views import FilmListView, FilmCreateView
-###from myproject.cinema.views import FilmListView, FilmCreateView
-#from .views import FilmListView, FilmCreateView
-
-
-#from .views import add_movie
-
-#urlpatterns = [
-#    path('api/movies/add/', add_movie),
-#]
-
+router = DefaultRouter()
+router.register(r'users', UserViewSet)
+router.register(r'genres', GenreViewSet)
+router.register(r'contents', ContentViewSet)
+router.register(r'movies', MovieViewSet)
+router.register(r'series', SeriesViewSet)
+router.register(r'seasons', SeasonViewSet)
+router.register(r'episodes', EpisodeViewSet)
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-###    path('cinema/', FilmListView.as_view(), name='film_list'),  # GET запрос
-###    path('cinema/create/', FilmCreateView.as_view(), name='film_create'),  # POST запрос
-
-    path('api/', include('cinema.urls')),
+    path('', include(router.urls)),
 ]
