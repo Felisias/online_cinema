@@ -27,8 +27,8 @@ class ContentSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class MovieSerializer(serializers.ModelSerializer):
-    content = ContentSerializer()
-
+    #content = ContentSerializer()    уходим от вложенного словаря к ожиданию id
+    content = serializers.PrimaryKeyRelatedField(queryset=Content.objects.all())  # 💡 вот это ключ
     class Meta:
         model = Movie
         fields = '__all__'
