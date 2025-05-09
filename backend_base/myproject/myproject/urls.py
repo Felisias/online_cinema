@@ -21,6 +21,8 @@ from django.urls import path
 from django.contrib import admin
 from django.urls import path, include
 
+#from rest_framework_simplejwt.views import ( TokenObtainPairView, TokenRefreshView,)
+
 
 
 #from online_cinema.backend_base.myproject.cinema.views import FilmListView, FilmCreateView
@@ -41,4 +43,6 @@ urlpatterns = [
 ###    path('cinema/create/', FilmCreateView.as_view(), name='film_create'),  # POST запрос
 
     path('api/', include('cinema.urls')),
+    #path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    #path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
