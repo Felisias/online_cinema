@@ -4,6 +4,7 @@ from .views import ChangePasswordView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
+    TokenBlacklistView
 )
 from rest_framework.routers import DefaultRouter
 from .views import (
@@ -32,5 +33,6 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('protected/', ProtectedHelloView.as_view(), name='protected_hello'),
     path('change-password/', ChangePasswordView.as_view(), name='change-password'),
+    path('logout/', TokenBlacklistView.as_view(), name='token_blacklist'),
     path('', include(router.urls)),
 ]
