@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
+from rest_framework import generics
 from .models import (
     User,
     Genre,
@@ -22,7 +23,8 @@ from .serializers import (
     SeasonSerializer,
     EpisodeSerializer,
     ReviewSerializer,
-    ChangePasswordSerializer
+    ChangePasswordSerializer,
+    UserRegistrationSerializer
 )
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
@@ -31,6 +33,11 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+
+
+class UserRegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserRegistrationSerializer
 
 
 class GenreViewSet(viewsets.ModelViewSet):

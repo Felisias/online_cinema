@@ -15,7 +15,8 @@ from .views import (
     SeriesViewSet,
     SeasonViewSet,
     EpisodeViewSet,
-    ReviewViewSet
+    ReviewViewSet,
+    UserRegisterView
 )
 
 router = DefaultRouter()
@@ -33,6 +34,7 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('protected/', ProtectedHelloView.as_view(), name='protected_hello'),
     path('change-password/', ChangePasswordView.as_view(), name='change-password'),
+    path('register/', UserRegisterView.as_view(), name='user-register'),
     path('logout/', TokenBlacklistView.as_view(), name='token_blacklist'),
     path('', include(router.urls)),
 ]
