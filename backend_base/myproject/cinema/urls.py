@@ -7,7 +7,8 @@ from .views import (
     MovieViewSet,
     SeriesViewSet,
     SeasonViewSet,
-    EpisodeViewSet
+    EpisodeViewSet,
+    ReviewViewSet
 )
 
 router = DefaultRouter()
@@ -18,6 +19,7 @@ router.register(r'movies', MovieViewSet)
 router.register(r'series', SeriesViewSet)
 router.register(r'seasons', SeasonViewSet)
 router.register(r'episodes', EpisodeViewSet)
+router.register(r'reviews', ReviewViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

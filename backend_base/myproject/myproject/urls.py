@@ -22,6 +22,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 
+
 #from online_cinema.backend_base.myproject.cinema.views import FilmListView, FilmCreateView
 ###from myproject.cinema.views import FilmListView, FilmCreateView
 #from .views import FilmListView, FilmCreateView

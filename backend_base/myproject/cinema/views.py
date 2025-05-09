@@ -6,7 +6,8 @@ from .models import (
     Movie,
     Series,
     Season,
-    Episode
+    Episode,
+    Review
 )
 from .serializers import (
     UserSerializer,
@@ -15,7 +16,8 @@ from .serializers import (
     MovieSerializer,
     SeriesSerializer,
     SeasonSerializer,
-    EpisodeSerializer
+    EpisodeSerializer,
+    ReviewSerializer
 )
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
@@ -60,3 +62,18 @@ class EpisodeViewSet(viewsets.ModelViewSet):
     queryset = Episode.objects.all()
     serializer_class = EpisodeSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+
+
+#class ReviewViewSet(viewsets.ModelViewSet):
+#    queryset = Review.objects.all()
+#    serializer_class = ReviewSerializer
+#    permission_classes = [IsAuthenticatedOrReadOnly]
+
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+
+    def get_serializer_context(self):
+        return {'request': self.request}

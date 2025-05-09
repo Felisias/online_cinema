@@ -111,3 +111,12 @@ class Episode(models.Model):
 
 
 
+class Review(models.Model):
+    id = models.AutoField(primary_key=True)
+    content = models.ForeignKey(Content, related_name='reviews', on_delete=models.CASCADE)
+    text = models.TextField()
+    rating = models.IntegerField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews')
+
+    def __str__(self):
+        return f"Review for {self.content.title} — Rating: {self.rating}"
