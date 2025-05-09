@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.contrib.auth.models import User
 from .models import (
     User,
     Genre,
@@ -88,3 +89,16 @@ class ReviewSerializer(serializers.ModelSerializer):
         if 'user' not in validated_data:
             validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
+
+
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
+    def validate_old_password(self, value):
+        user = self.context['request'].user
+        if not user.check_password(value):
+            raise serializers.ValidationError("Старый пароль неверен.")
+        return value
