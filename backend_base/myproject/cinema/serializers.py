@@ -91,23 +91,35 @@ class EpisodeSerializer(serializers.ModelSerializer):
 
 
 
+#class ReviewSerializer(serializers.ModelSerializer):
+#    class Meta:
+#        model = Review
+#        fields = '__all__'
+#
+#    def to_internal_value(self, data):
+#        # Если пользователь не админ, удаляем поле 'user' из входящих данных
+#        if not self.context['request'].user.is_staff:
+#            data = data.copy()
+#            data.pop('user', None)
+#        return super().to_internal_value(data)
+#
+#    def create(self, validated_data):
+#        # Для всех: если 'user' не указан, то ставим request.user
+#        if 'user' not in validated_data:
+#            validated_data['user'] = self.context['request'].user
+#        return super().create(validated_data)
+
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = '__all__'
-
-    def to_internal_value(self, data):
-        # Если пользователь не админ, удаляем поле 'user' из входящих данных
-        if not self.context['request'].user.is_staff:
-            data = data.copy()
-            data.pop('user', None)
-        return super().to_internal_value(data)
+        read_only_fields = ['user']  # пользователь не указывается напрямую
 
     def create(self, validated_data):
-        # Для всех: если 'user' не указан, то ставим request.user
-        if 'user' not in validated_data:
-            validated_data['user'] = self.context['request'].user
+        validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
+
+
 
 
 

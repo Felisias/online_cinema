@@ -83,12 +83,21 @@ class EpisodeViewSet(viewsets.ModelViewSet):
 
 
 
+#class ReviewViewSet(viewsets.ModelViewSet):
+#    queryset = Review.objects.all()
+#    serializer_class = ReviewSerializer
+#
+#    def get_serializer_context(self):
+#        return {'request': self.request}
+
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_serializer_context(self):
         return {'request': self.request}
+
 
 
 
