@@ -19,7 +19,9 @@ from .views import (
     UserRegisterView,
     login_view,
     home_view,
-    register_view
+    register_view,
+    content_detail_view,
+    add_review_view
 )
 
 router = DefaultRouter()
@@ -46,6 +48,8 @@ urlpatterns = [
     path('', home_view, name='home'),
     path('login/', login_view, name='login'),
     path('register/', register_view, name='register'),
+    path('content/<int:content_id>/', content_detail_view, name='content_detail'),
+    path('content/<int:content_id>/review/', add_review_view, name='add_review'),
     #path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     #path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

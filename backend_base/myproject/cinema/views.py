@@ -34,7 +34,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 import requests
 from django.contrib.auth import authenticate, login
-
+from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
 
 API_URL = "http://localhost:8000/api/token/"
@@ -149,6 +149,98 @@ def home_view(request):
         'contents': contents,
         'genre_map': genre_map,
     })
+
+
+
+
+
+def content_detail_view(request, content_id):
+    access_token = request.session.get('access_token')
+
+    if not access_token:
+        return redirect('login')
+
+    headers = {'Authorization': f'Bearer {access_token}'}
+
+    content_data = None
+    movie_data = None
+    reviews = []
+
+    try:
+        # Получение контента
+        content_resp = requests.get(f'http://127.0.0.1:8000/api/contents/{content_id}/', headers=headers)
+        if content_resp.status_code == 200:
+            content_data = content_resp.json()
+        else:
+            return HttpResponse("Контент не найден", status=404)
+
+        # Получение жанров
+        genres_resp = requests.get('http://127.0.0.1:8000/api/genres/', headers=headers)
+        genre_map = {g['id']: g['name'] for g in genres_resp.json()} if genres_resp.status_code == 200 else {}
+
+        # Movie-данные (если есть)
+        movie_resp = requests.get(f'http://127.0.0.1:8000/api/movies/{content_id}/', headers=headers)
+        if movie_resp.status_code == 200:
+            movie_data = movie_resp.json()
+
+        # Получение всех отзывов и фильтрация по content_id
+        reviews_resp = requests.get('http://127.0.0.1:8000/api/reviews/', headers=headers)
+        if reviews_resp.status_code == 200:
+            all_reviews = reviews_resp.json()
+            reviews = [r for r in all_reviews if r.get('content') == content_id]
+
+    except requests.exceptions.RequestException as e:
+        return HttpResponse("Ошибка соединения с API", status=500)
+
+    return render(request, 'content_detail.html', {
+        'content': content_data,
+        'movie': movie_data,
+        'genre_name': genre_map.get(content_data['genre'], 'Неизвестно'),
+        'reviews': reviews,
+    })
+
+
+
+
+
+
+def add_review_view(request, content_id):
+    if request.method == 'POST':
+        access_token = request.session.get('access_token')
+        if not access_token:
+            return redirect('login')
+
+        headers = {'Authorization': f'Bearer {access_token}'}
+
+        text = request.POST.get('text')
+        rating = request.POST.get('rating')
+
+        try:
+            review_data = {
+                'content': content_id,
+                'text': text,
+                'rating': rating
+            }
+
+            response = requests.post('http://127.0.0.1:8000/api/reviews/', json=review_data, headers={
+                'Authorization': f'Bearer {access_token}',
+                'Content-Type': 'application/json'
+            })
+
+            if response.status_code in [200, 201]:
+                return redirect('content_detail', content_id=content_id)
+            else:
+                return HttpResponse("Ошибка при отправке отзыва", status=response.status_code)
+
+        except requests.exceptions.RequestException as e:
+            return HttpResponse("Ошибка соединения", status=500)
+
+    return redirect('content_detail', content_id=content_id)
+
+
+
+
+
 
 
 class UserViewSet(viewsets.ModelViewSet):

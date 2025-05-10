@@ -1,3 +1,4 @@
+<!-- home.html -->
 {% load static %}
 {% load custom_filters %}
 <!DOCTYPE html>
@@ -23,6 +24,8 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            text-decoration: none;
+            color: inherit;
         }
         .card img {
             width: 100%;
@@ -47,17 +50,16 @@
     <h2>Добро пожаловать в кинотеатр</h2>
     <div class="grid">
         {% for item in contents %}
-            <div class="card">
+            <a href="{% url 'content_detail' item.id %}" class="card">
                 <img src="{% static 'images/content/' %}{{ item.id }}.jpg" alt="Изображение">
                 <div class="card-body">
                     <div class="card-title">{{ item.title }}</div>
                     <div class="card-info">
-                        Режиссёр: {{ item.director }}<br>
                         Возрастной рейтинг: {{ item.age_rating }}+<br>
                         Жанр: {{ genre_map|dict_get:item.genre }}
                     </div>
                 </div>
-            </div>
+            </a>
         {% empty %}
             <p>Контент не найден.</p>
         {% endfor %}
