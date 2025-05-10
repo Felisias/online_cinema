@@ -1,0 +1,14 @@
+<h2>Добро пожаловать в кинотеатр</h2>
+<ul>
+  {% for movie in movies %}
+    <li>
+      <strong>ID:</strong> {{ movie.id }}<br>
+      <strong>Продолжительность:</strong> {{ movie.duration }} минут<br>
+      <strong>Дата релиза:</strong> {{ movie.release_date }}<br>
+      <strong>Файл:</strong> {{ movie.file_path }}<br>
+      <strong>ID контента:</strong> {{ movie.content }}
+    </li>
+  {% empty %}
+    <li>Фильмы не найдены.</li>
+  {% endfor %}
+</ul>

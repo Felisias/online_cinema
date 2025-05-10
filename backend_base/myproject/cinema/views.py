@@ -1,9 +1,13 @@
+import requests
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework import generics
+from .forms import LoginForm
 from .models import (
     User,
     Genre,
@@ -27,6 +31,114 @@ from .serializers import (
     UserRegistrationSerializer
 )
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+
+import requests
+from django.contrib.auth import authenticate, login
+
+from django.shortcuts import render, redirect
+
+API_URL = "http://localhost:8000/api/token/"
+
+
+def login_view(request):
+    if request.method == 'POST':
+        username  = request.POST.get('username')
+        password = request.POST.get('password')
+
+        # Отправляем данные на JWT-эндпоинт
+        response = requests.post(API_URL, data={
+            'email': username ,
+            'password': password
+        })
+
+        if response.status_code == 200:
+            tokens = response.json()
+            access_token = tokens['access']
+            refresh_token = tokens['refresh']
+
+            request.session['access_token'] = access_token
+            request.session['refresh_token'] = refresh_token
+
+            return redirect('home')
+        else:
+            return render(request, 'login.html', {'error': 'Неверный логин или пароль'})
+
+    return render(request, 'login.html')
+
+
+def register_view(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        if not all([email, password]):
+            return render(request, 'register.html', {'error': 'Заполните все поля.'})
+
+        if User.objects.filter(email=email).exists():
+            return render(request, 'register.html', {'error': 'Email уже зарегистрирован.'})
+
+        user = User.objects.create_user(email=email, username=username, password=password)
+        user.save()
+
+        # После регистрации пользователя выполняем аутентификацию через email
+        user = authenticate(request, email=email, password=password)
+
+        # Получаем токен, как в login_view
+        response = requests.post(API_URL, data={
+            'email': email,
+            'password': password
+        })
+
+        if response.status_code == 200:
+            tokens = response.json()
+            access_token = tokens['access']
+            refresh_token = tokens['refresh']
+
+            request.session['access_token'] = access_token
+            request.session['refresh_token'] = refresh_token
+            return redirect('home')
+        else:
+            return render(request, 'register.html', {'error': 'Регистрация прошла, но вход не выполнен.'})
+
+
+#        if user is not None:
+#            login(request, user)
+#            return redirect('/')  # перенаправление на главную
+#        else:
+#            return render(request, 'register.html', {'error': 'Ошибка аутентификации.'})
+
+    return render(request, 'register.html')
+
+
+
+
+
+def home_view(request):
+    access_token = request.session.get('access_token')
+
+    if not access_token:
+        return redirect('login')
+
+    headers = {'Authorization': f'Bearer {access_token}'}
+
+    try:
+        response = requests.get('http://127.0.0.1:8000/api/movies/', headers=headers)
+
+        if response.status_code == 200:
+            movies = response.json()
+        elif response.status_code == 401:
+            # Токен недействителен — отправим на логин
+            return redirect('login')
+        else:
+            movies = []
+            print(f"Ошибка при получении фильмов: {response.status_code} — {response.text}")
+
+    except requests.exceptions.RequestException as e:
+        print("Ошибка соединения с API:", e)
+        movies = []
+
+    return render(request, 'home.html', {'movies': movies})
 
 
 class UserViewSet(viewsets.ModelViewSet):

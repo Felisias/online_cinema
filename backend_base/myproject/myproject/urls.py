@@ -42,7 +42,7 @@ urlpatterns = [
 ###    path('cinema/', FilmListView.as_view(), name='film_list'),  # GET запрос
 ###    path('cinema/create/', FilmCreateView.as_view(), name='film_create'),  # POST запрос
 
-    path('api/', include('cinema.urls')),
+    path('', include('cinema.urls')),
     #path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     #path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

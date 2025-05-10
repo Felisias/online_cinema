@@ -16,7 +16,10 @@ from .views import (
     SeasonViewSet,
     EpisodeViewSet,
     ReviewViewSet,
-    UserRegisterView
+    UserRegisterView,
+    login_view,
+    home_view,
+    register_view
 )
 
 router = DefaultRouter()
@@ -30,11 +33,19 @@ router.register(r'episodes', EpisodeViewSet)
 router.register(r'reviews', ReviewViewSet)
 
 urlpatterns = [
-    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('protected/', ProtectedHelloView.as_view(), name='protected_hello'),
-    path('change-password/', ChangePasswordView.as_view(), name='change-password'),
-    path('register/', UserRegisterView.as_view(), name='user-register'),
-    path('logout/', TokenBlacklistView.as_view(), name='token_blacklist'),
-    path('', include(router.urls)),
+    # API endpoints
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/protected/', ProtectedHelloView.as_view(), name='protected_hello'),
+    path('api/change-password/', ChangePasswordView.as_view(), name='change-password'),
+    path('api/register/', UserRegisterView.as_view(), name='user-register'),
+    path('api/logout/', TokenBlacklistView.as_view(), name='token_blacklist'),
+    path('api/', include(router.urls)),
+
+    # UI (шаблоны)
+    path('', home_view, name='home'),
+    path('login/', login_view, name='login'),
+    path('register/', register_view, name='register'),
+    #path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    #path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
