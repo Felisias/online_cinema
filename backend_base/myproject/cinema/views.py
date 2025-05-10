@@ -121,24 +121,34 @@ def home_view(request):
         return redirect('login')
 
     headers = {'Authorization': f'Bearer {access_token}'}
+    contents = []
+    genre_map = {}
 
     try:
-        response = requests.get('http://127.0.0.1:8000/api/movies/', headers=headers)
-
-        if response.status_code == 200:
-            movies = response.json()
-        elif response.status_code == 401:
-            # Токен недействителен — отправим на логин
+        # Получение контента
+        content_response = requests.get('http://127.0.0.1:8000/api/contents/', headers=headers)
+        if content_response.status_code == 200:
+            contents = content_response.json()
+        elif content_response.status_code == 401:
             return redirect('login')
         else:
-            movies = []
-            print(f"Ошибка при получении фильмов: {response.status_code} — {response.text}")
+            print(f"Ошибка при получении контента: {content_response.status_code} — {content_response.text}")
+
+        # Получение жанров
+        genres_response = requests.get('http://127.0.0.1:8000/api/genres/', headers=headers)
+        if genres_response.status_code == 200:
+            genres = genres_response.json()
+            genre_map = {g['id']: g['name'] for g in genres}
+        else:
+            print(f"Ошибка при получении жанров: {genres_response.status_code} — {genres_response.text}")
 
     except requests.exceptions.RequestException as e:
         print("Ошибка соединения с API:", e)
-        movies = []
 
-    return render(request, 'home.html', {'movies': movies})
+    return render(request, 'home.html', {
+        'contents': contents,
+        'genre_map': genre_map,
+    })
 
 
 class UserViewSet(viewsets.ModelViewSet):
