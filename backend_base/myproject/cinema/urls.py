@@ -22,7 +22,8 @@ from .views import (
     register_view,
     content_detail_view,
     add_review_view,
-    user_info_view
+    user_info_view,
+    TokenBlacklistView
 )
 
 router = DefaultRouter()

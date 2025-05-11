@@ -4,6 +4,8 @@ from django.http import HttpResponse
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
@@ -117,6 +119,7 @@ def register_view(request):
 
 def home_view(request):
     access_token = request.session.get('access_token')
+    refresh_token = request.session.get('refresh_token')
 
     if not access_token:
         return redirect('login')
@@ -124,8 +127,15 @@ def home_view(request):
     headers = {'Authorization': f'Bearer {access_token}'}
     contents = []
     genre_map = {}
+    username = None
 
     try:
+
+        # Получаем имя текущего пользователя
+        user_resp = requests.get('http://127.0.0.1:8000/api/user-info/', headers=headers)
+        if user_resp.status_code == 200:
+            username = user_resp.json().get('username')
+
         # Получение контента
         content_response = requests.get('http://127.0.0.1:8000/api/contents/', headers=headers)
         if content_response.status_code == 200:
@@ -149,6 +159,9 @@ def home_view(request):
     return render(request, 'home.html', {
         'contents': contents,
         'genre_map': genre_map,
+        'username': username,
+        'access_token': access_token,
+        'refresh_token': refresh_token
     })
 
 
@@ -245,6 +258,27 @@ def add_review_view(request, content_id):
             return HttpResponse("Ошибка соединения", status=500)
 
     return redirect('content_detail', content_id=content_id)
+
+
+
+
+
+
+class TokenBlacklistView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+
+            request.session.pop('access_token', None)
+            request.session.pop('refresh_token', None)
+
+            return Response(status=status.HTTP_205_RESET_CONTENT)
+        except Exception:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 
