@@ -1,14 +1,113 @@
-<form method="post">
-  {% csrf_token %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация — Пиратская бухта</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-  <label>Email:</label><br>
-  <input type="email" name="email" required><br><br>
+        .register-container {
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+            width: 100%;
+            max-width: 400px;
+        }
 
-  <label>Username:</label><br>
-  <input type="username" name="username" required><br><br>
+        .register-container h1 {
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 28px;
+        }
 
-  <label>Password:</label><br>
-  <input type="password" name="password" required><br><br>
-  
-  <input type="submit" value="Register">
-</form>
+        .register-container form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        input[type="email"],
+        input[type="username"],
+        input[type="password"] {
+            padding: 10px;
+            margin-bottom: 16px;
+            border: none;
+            border-radius: 8px;
+            background-color: #e0e0e0;
+            color: #333;
+        }
+
+        input[type="submit"] {
+            padding: 12px;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #449d48;
+        }
+
+        .login-link {
+            display: block;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #aaa;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .login-link:hover {
+            color: #fff;
+        }
+
+        .error {
+            color: #f44336;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <a class="login-link" href="{% url 'login' %}">Уже есть аккаунт? Войти</a>
+
+        <h1>Регистрация</h1>
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <label>Email:</label>
+            <input type="email" name="email" required>
+
+            <label>Username:</label>
+            <input type="username" name="username" required>
+
+            <label>Password:</label>
+            <input type="password" name="password" required>
+
+            <input type="submit" value="Зарегистрироваться">
+        </form>
+    </div>
+</body>
+</html>
