@@ -21,7 +21,8 @@ from .views import (
     home_view,
     register_view,
     content_detail_view,
-    add_review_view
+    add_review_view,
+    user_info_view
 )
 
 router = DefaultRouter()
@@ -42,6 +43,7 @@ urlpatterns = [
     path('api/change-password/', ChangePasswordView.as_view(), name='change-password'),
     path('api/register/', UserRegisterView.as_view(), name='user-register'),
     path('api/logout/', TokenBlacklistView.as_view(), name='token_blacklist'),
+    path('api/user-info/', user_info_view, name='user_info'),
     path('api/', include(router.urls)),
 
     # UI (шаблоны)

@@ -57,6 +57,7 @@ class Content(models.Model):
     title = models.CharField(max_length=255)  # Название контента
     director = models.CharField(max_length=255, blank=True, null=True)  # Режиссёр
     age_rating = models.IntegerField()  # Возрастное ограничение
+    description = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.title

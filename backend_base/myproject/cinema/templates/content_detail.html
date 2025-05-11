@@ -1,4 +1,3 @@
-<!-- content_detail.html -->
 {% load static %}
 <!DOCTYPE html>
 <html lang="ru">
@@ -10,76 +9,208 @@
             font-family: sans-serif;
             padding: 40px;
             background-color: #f0f0f0;
-            text-align: center;
         }
-        img {
-            width: 600px;
-            height: auto;
+        .main-container {
+            display: flex;
+            gap: 40px;
+        }
+        .poster {
+            flex: 0 0 300px;
+        }
+        .poster img {
+            width: 100%;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
+        .info-block {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
         .title {
-            font-size: 32px;
-            margin-top: 20px;
+            font-size: 36px;
             font-weight: bold;
         }
-        .info {
+        .age-rating {
+            font-size: 20px;
+            margin-top: 5px;
+            color: #888;
+        }
+        .watch-button {
+            margin: 20px 0;
+        }
+        .watch-button a {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+        .about {
+            margin-top: 20px;
+        }
+        .about h3 {
+            margin-bottom: 10px;
+        }
+        .about-item {
+            margin-bottom: 6px;
+        }
+        .description {
             margin-top: 15px;
-            font-size: 18px;
-            color: #444;
+            white-space: pre-wrap;
+        }
+        .reviews-section {
+            display: flex;
+            margin-top: 60px;
+            gap: 40px;
+        }
+        .reviews-list {
+            flex: 1;
+        }
+        .review {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 15px;
+        }
+        .review-avatar {
+            width: 40px;
+            height: 40px;
+            background-color: #ccc;
+            border-radius: 50%;
+        }
+        .review-content {
+            flex: 1;
+        }
+        .review-username {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .review-rating {
+            margin-top: 8px;
+            font-size: 14px;
+            color: #888;
+        }
+        .review-form {
+            flex: 1;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .form-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+        .form-header .avatar {
+            width: 40px;
+            height: 40px;
+            background-color: #ccc;
+            border-radius: 50%;
+        }
+        textarea {
+            width: 97%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            resize: vertical;
+        }
+        .form-bottom {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .form-bottom input[type="number"] {
+            width: 60px;
+        }
+        .form-bottom button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            border: none;
+            color: white;
+            border-radius: 6px;
         }
     </style>
 </head>
 <body>
+
     <a href="{% url 'home' %}" style="position: absolute; top: 20px; right: 200px; text-decoration: none; font-size: 24px; color: #333;">&#10005;</a>
-    <img src="{% static 'images/content/' %}{{ content.id }}.jpg" alt="Изображение">
-    <div class="title">{{ content.title }}</div>
-    <div class="info">
-        Возрастной рейтинг: {{ content.age_rating }}+<br>
-        Режиссёр: {{ content.director }}<br>
-        Жанр: {{ genre_name }}<br>
-        {% if movie %}
-            Продолжительность: {{ movie.duration }} минут<br>
-            Дата релиза: {{ movie.release_date }}<br>
-            <a href="{{ movie.file_path }}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">
-                Смотреть
-            </a>
 
-        {% endif %}
-    </div>
-</body>
+    <div class="main-container">
+        <!-- Левая колонка: картинка -->
+        <div class="poster">
+            <img src="{% static 'images/content/' %}{{ content.id }}.jpg" alt="Изображение">
+        </div>
 
+        <!-- Правая колонка: инфо -->
+        <div class="info-block">
+            <div class="title">{{ content.title }}</div>
+            <div class="age-rating">{{ content.age_rating }}+</div>
 
-<hr style="margin: 40px 0;">
+            {% if movie %}
+                <div class="watch-button">
+                    <a href="{{ movie.file_path }}" target="_blank">Смотреть</a>
+                </div>
+            {% endif %}
 
-<h3 style="font-size: 26px; text-align: left;">Отзывы пользователей</h3>
-
-<form method="POST" action="{% url 'add_review' content.id %}" style="margin-bottom: 30px;">
-    {% csrf_token %}
-    <textarea name="text" rows="4" placeholder="Напишите отзыв..." style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc;" required></textarea>
-    <br><br>
-    <label>Оценка:
-        <input type="number" name="rating" min="1" max="10" style="width: 60px;" required>
-    </label>
-    <br><br>
-    <button type="submit" style="padding: 10px 20px; background-color: #007bff; border: none; color: white; border-radius: 6px;">Оставить отзыв</button>
-</form>
-
-<div style="display: flex; flex-direction: column; align-items: stretch; gap: 20px; margin-top: 20px;">
-    {% if reviews %}
-        {% for review in reviews %}
-            <div style="background-color: #fff; padding: 15px 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: left;">
-                <div style="font-weight: bold; font-size: 16px;">{{ review.username }}</div>
-                <div style="margin-top: 5px;">{{ review.text }}</div>
-                <div style="margin-top: 10px; font-size: 14px; color: #888;">Оценка: {{ review.rating }}/10</div>
+            <div class="about">
+                <h3>О фильме</h3>
+                <div class="about-item"><strong>Жанр:</strong> {{ genre_name }}</div>
+                <div class="about-item"><strong>Режиссёр:</strong> {{ content.director }}</div>
+                {% if movie %}
+                    <div class="about-item"><strong>Дата релиза:</strong> {{ movie.release_date }}</div>
+                    <div class="about-item"><strong>Продолжительность:</strong> {{ movie.duration }} минут</div>
+                {% endif %}
+                <div class="description">{{ content.description }}</div>
             </div>
-        {% endfor %}
-    {% else %}
-        <p>Пока нет отзывов на этот контент.</p>
-    {% endif %}
-</div>
+        </div>
+    </div>
 
+    <div class="reviews-section">
+        <!-- Отзывы (левая часть) -->
+        <div class="reviews-list">
+            <h3>Отзывы пользователей</h3>
+            {% if reviews %}
+                {% for review in reviews %}
+                    <div class="review">
+                        <div class="review-avatar"></div>
+                        <div class="review-content">
+                            <div class="review-username">{{ review.username }}</div>
+                            <div>{{ review.text }}</div>
+                            <div class="review-rating">Оценка: {{ review.rating }}/10</div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>Пока нет отзывов на этот контент.</p>
+            {% endif %}
+        </div>
 
+        <!-- Форма отзыва (правая часть) -->
+        <div class="review-form">
+            <form method="POST" action="{% url 'add_review' content.id %}">
+                {% csrf_token %}
+                <div class="form-header">
+                    <div class="avatar"></div>
+                    <strong>{{ username }}</strong>
+                </div>
+                <textarea name="text" rows="5" placeholder="Напишите отзыв..." required></textarea>
+                <div class="form-bottom">
+                    <label>Оценка:
+                        <input type="number" name="rating" min="1" max="10" required>
+                    </label>
+                    <button type="submit">Оставить отзыв</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-
+</body>
 </html>

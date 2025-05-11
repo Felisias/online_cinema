@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework import generics
@@ -165,8 +166,15 @@ def content_detail_view(request, content_id):
     content_data = None
     movie_data = None
     reviews = []
+    username = None
 
     try:
+
+        # Получаем имя текущего пользователя
+        user_resp = requests.get('http://127.0.0.1:8000/api/user-info/', headers=headers)
+        if user_resp.status_code == 200:
+            username = user_resp.json().get('username')
+
         # Получение контента
         content_resp = requests.get(f'http://127.0.0.1:8000/api/contents/{content_id}/', headers=headers)
         if content_resp.status_code == 200:
@@ -197,6 +205,7 @@ def content_detail_view(request, content_id):
         'movie': movie_data,
         'genre_name': genre_map.get(content_data['genre'], 'Неизвестно'),
         'reviews': reviews,
+        'username': username
     })
 
 
@@ -320,6 +329,18 @@ class ProtectedHelloView(APIView):
 
     def get(self, request):
         return Response({"message": f"Привет, {request.user.username}. Ты аутентифицирован!"})
+
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_info_view(request):
+    return Response({
+        'id': request.user.id,
+        'username': request.user.username,
+        'email': request.user.email
+    })
 
 
 
