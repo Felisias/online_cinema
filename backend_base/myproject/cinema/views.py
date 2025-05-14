@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.decorators import api_view, permission_classes
@@ -34,6 +35,7 @@ from .serializers import (
     UserRegistrationSerializer
 )
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import AllowAny
 
 import requests
 from django.contrib.auth import authenticate, login
@@ -41,6 +43,41 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
 
 API_URL = "http://localhost:8000/api/token/"
+
+
+def refresh_access_token(refresh_token, request):
+    #response = requests.post('http://127.0.0.1:8000/api/token/refresh/', data={'refresh': refresh_token})
+    #if response.status_code == 200:
+    #    new_tokens = response.json()
+    #    new_access = new_tokens.get('access')
+    #    request.session['access_token'] = new_access
+    #    return new_access
+    #else:
+    #    # refresh token тоже невалиден — выходим
+    #    request.session.pop('access_token', None)
+    #    request.session.pop('refresh_token', None)
+    #    return None
+    try:
+        token = RefreshToken(refresh_token)
+        new_access = str(token.access_token)
+        request.session['access_token'] = new_access
+        return new_access
+    except TokenError:
+        request.session.pop('access_token', None)
+        request.session.pop('refresh_token', None)
+        return None
+
+def refresh_token_to_delete(refresh_token, request):
+    try:
+        token = RefreshToken(refresh_token)
+        return token
+    except TokenError:
+        #request.session.pop('access_token', None)
+        #request.session.pop('refresh_token', None)
+        return None
+
+
+
 
 
 def login_view(request):
@@ -75,7 +112,7 @@ def register_view(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
 
-        if not all([email, password]):
+        if not all([username, email, password]):
             return render(request, 'register.html', {'error': 'Заполните все поля.'})
 
         if User.objects.filter(email=email).exists():
@@ -85,7 +122,7 @@ def register_view(request):
         user.save()
 
         # После регистрации пользователя выполняем аутентификацию через email
-        user = authenticate(request, email=email, password=password)
+        #user = authenticate(request, email=email, password=password)
 
         # Получаем токен, как в login_view
         response = requests.post(API_URL, data={
@@ -133,8 +170,21 @@ def home_view(request):
 
         # Получаем имя текущего пользователя
         user_resp = requests.get('http://127.0.0.1:8000/api/user-info/', headers=headers)
+
+        if user_resp.status_code == 401 and refresh_token:
+            new_access_token = refresh_access_token(refresh_token, request)
+            if new_access_token:
+                headers['Authorization'] = f'Bearer {new_access_token}'
+                user_resp = requests.get('http://127.0.0.1:8000/api/user-info/', headers=headers)
+            else:
+                return redirect('login')
+
         if user_resp.status_code == 200:
             username = user_resp.json().get('username')
+        elif user_resp.status_code == 401:
+            request.session.pop('access_token', None)
+            request.session.pop('refresh_token', None)
+            return redirect('login')
 
         # Получение контента
         content_response = requests.get('http://127.0.0.1:8000/api/contents/', headers=headers)
@@ -170,23 +220,36 @@ def home_view(request):
 
 def content_detail_view(request, content_id):
     access_token = request.session.get('access_token')
+    refresh_token = request.session.get('refresh_token')
 
-    if not access_token:
-        return redirect('login')
+    #if not access_token:
+    #    return redirect('login')
 
     headers = {'Authorization': f'Bearer {access_token}'}
-
     content_data = None
     movie_data = None
     reviews = []
     username = None
 
     try:
-
         # Получаем имя текущего пользователя
         user_resp = requests.get('http://127.0.0.1:8000/api/user-info/', headers=headers)
+
+        if user_resp.status_code == 401 and refresh_token:
+            new_access_token = refresh_access_token(refresh_token, request)
+            if new_access_token:
+                headers['Authorization'] = f'Bearer {new_access_token}'
+                user_resp = requests.get('http://127.0.0.1:8000/api/user-info/', headers=headers)
+            else:
+                return redirect('login')
+
+
         if user_resp.status_code == 200:
             username = user_resp.json().get('username')
+        elif user_resp.status_code == 401:
+            request.session.pop('access_token', None)
+            request.session.pop('refresh_token', None)
+            return redirect('login')
 
         # Получение контента
         content_resp = requests.get(f'http://127.0.0.1:8000/api/contents/{content_id}/', headers=headers)
@@ -199,7 +262,7 @@ def content_detail_view(request, content_id):
         genres_resp = requests.get('http://127.0.0.1:8000/api/genres/', headers=headers)
         genre_map = {g['id']: g['name'] for g in genres_resp.json()} if genres_resp.status_code == 200 else {}
 
-        # Movie-данные (если есть)
+        # Movie-данные
         movie_resp = requests.get(f'http://127.0.0.1:8000/api/movies/{content_id}/', headers=headers)
         if movie_resp.status_code == 200:
             movie_data = movie_resp.json()
@@ -218,7 +281,9 @@ def content_detail_view(request, content_id):
         'movie': movie_data,
         'genre_name': genre_map.get(content_data['genre'], 'Неизвестно'),
         'reviews': reviews,
-        'username': username
+        'username': username,
+        "access_token": access_token,
+        "refresh_token": refresh_token
     })
 
 
@@ -229,6 +294,8 @@ def content_detail_view(request, content_id):
 def add_review_view(request, content_id):
     if request.method == 'POST':
         access_token = request.session.get('access_token')
+        refresh_token = request.session.get('refresh_token')
+
         if not access_token:
             return redirect('login')
 
@@ -244,15 +311,28 @@ def add_review_view(request, content_id):
                 'rating': rating
             }
 
-            response = requests.post('http://127.0.0.1:8000/api/reviews/', json=review_data, headers={
-                'Authorization': f'Bearer {access_token}',
-                'Content-Type': 'application/json'
-            })
+            #response = requests.post('http://127.0.0.1:8000/api/reviews/', json=review_data, headers={
+            #    'Authorization': f'Bearer {access_token}',
+            #    'Content-Type': 'application/json'
+            #})
+
+            response = requests.post('http://127.0.0.1:8000/api/reviews/', json=review_data, headers=headers)
+
+
+            if response.status_code == 401 and refresh_token:
+                new_access_token = refresh_access_token(refresh_token, request)
+                if new_access_token:
+                    headers['Authorization'] = f'Bearer {new_access_token}'
+                    response = requests.post('http://127.0.0.1:8000/api/reviews/', json=review_data, headers=headers)
+                else:
+                    return redirect('login')
+
 
             if response.status_code in [200, 201]:
                 return redirect('content_detail', content_id=content_id)
             else:
                 return HttpResponse("Ошибка при отправке отзыва", status=response.status_code)
+
 
         except requests.exceptions.RequestException as e:
             return HttpResponse("Ошибка соединения", status=500)
@@ -261,29 +341,30 @@ def add_review_view(request, content_id):
 
 
 
-
-
-
 class TokenBlacklistView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def post(self, request):
+        refresh_token = request.data.get("refresh")
+
+        if not refresh_token:
+            return Response({"error": "No refresh token provided"}, status=400)
+
+        token = refresh_token_to_delete(refresh_token, request)
+
+        if token is None:
+            return Response({"error": "Invalid or expired refresh token"}, status=400)
+
         try:
-            refresh_token = request.data["refresh"]
-            token = RefreshToken(refresh_token)
             token.blacklist()
 
-            request.session.pop('access_token', None)
-            request.session.pop('refresh_token', None)
+            #request.session.pop('access_token', None)
+            #request.session.pop('refresh_token', None)
 
-            return Response(status=status.HTTP_205_RESET_CONTENT)
-        except Exception:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        except AttributeError:
+            return Response({"error": "Token does not support blacklisting"}, status=400)
 
-
-
-
-
+        return Response(status=205)
 
 
 class UserViewSet(viewsets.ModelViewSet):

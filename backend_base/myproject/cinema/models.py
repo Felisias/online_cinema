@@ -12,7 +12,7 @@ class UserManager(BaseUserManager):
         email = self.normalize_email(email)
         user = self.model(email=email, username=username, **extra_fields)
         user.set_password(password)  # Хеширование пароля
-        user.save(using=self._db)
+        #user.save(using=self._db)
         return user
 
     def create_superuser(self, email, username, password=None, **extra_fields):
