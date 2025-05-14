@@ -1,30 +1,45 @@
 from django.urls import path, include
-from .views import ProtectedHelloView
-from .views import ChangePasswordView
+#from .views import ProtectedHelloView
+#from .views import ChangePasswordView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
     TokenBlacklistView
 )
 from rest_framework.routers import DefaultRouter
-from .views import (
-    UserViewSet,
-    GenreViewSet,
-    ContentViewSet,
-    MovieViewSet,
-    SeriesViewSet,
-    SeasonViewSet,
-    EpisodeViewSet,
-    ReviewViewSet,
-    UserRegisterView,
-    login_view,
-    home_view,
-    register_view,
-    content_detail_view,
-    add_review_view,
-    user_info_view,
-    TokenBlacklistView,
-    logout_view
+#from .views import (
+    #UserViewSet,
+    #ProtectedHelloView,
+    #ChangePasswordView,
+    #GenreViewSet,
+    #ContentViewSet,
+    #MovieViewSet,
+    #SeriesViewSet,
+    #SeasonViewSet,
+    #EpisodeViewSet,
+    #ReviewViewSet,
+    #UserRegisterView,
+    #login_view,
+    #home_view,
+    #register_view,
+    #content_detail_view,
+    #add_review_view,
+    #user_info_view,
+    #UserInfoView,
+    #TokenBlacklistView,
+    #logout_view
+#)
+
+from .views_frontend import (
+    login_view, register_view, logout_view,
+    home_view, content_detail_view, add_review_view
+)
+
+from .views_api import (
+    ProtectedHelloView, ChangePasswordView, TokenBlacklistView,
+    UserRegisterView, UserInfoView, user_info_view,
+    UserViewSet, GenreViewSet, ContentViewSet, MovieViewSet,
+    SeriesViewSet, SeasonViewSet, EpisodeViewSet, ReviewViewSet
 )
 
 router = DefaultRouter()
@@ -45,6 +60,7 @@ urlpatterns = [
     path('api/change-password/', ChangePasswordView.as_view(), name='change-password'),
     path('api/register/', UserRegisterView.as_view(), name='user-register'),
     path('api/logout/', TokenBlacklistView.as_view(), name='token_blacklist'),
+    path('user-info/', UserInfoView.as_view(), name='user-info'),
     path('api/user-info/', user_info_view, name='user_info'),
     path('api/', include(router.urls)),
 

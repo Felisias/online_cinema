@@ -341,30 +341,30 @@ def add_review_view(request, content_id):
 
 
 
-class TokenBlacklistView(APIView):
-    permission_classes = [AllowAny]
-
-    def post(self, request):
-        refresh_token = request.data.get("refresh")
-
-        if not refresh_token:
-            return Response({"error": "No refresh token provided"}, status=400)
-
-        token = refresh_token_to_delete(refresh_token, request)
-
-        if token is None:
-            return Response({"error": "Invalid or expired refresh token"}, status=400)
-
-        try:
-            token.blacklist()
-
-            #request.session.pop('access_token', None)
-            #request.session.pop('refresh_token', None)
-
-        except AttributeError:
-            return Response({"error": "Token does not support blacklisting"}, status=400)
-
-        return Response(status=205)
+#####class TokenBlacklistView(APIView):
+#####    permission_classes = [AllowAny]
+#####
+#####    def post(self, request):
+#####        refresh_token = request.data.get("refresh")
+#####
+#####        if not refresh_token:
+#####            return Response({"error": "No refresh token provided"}, status=400)
+#####
+#####        token = refresh_token_to_delete(refresh_token, request)
+#####
+#####        if token is None:
+#####            return Response({"error": "Invalid or expired refresh token"}, status=400)
+#####
+#####        try:
+#####            token.blacklist()
+#####
+#####            #request.session.pop('access_token', None)
+#####            #request.session.pop('refresh_token', None)
+#####
+#####        except AttributeError:
+#####            return Response({"error": "Token does not support blacklisting"}, status=400)
+#####
+#####        return Response(status=205)
 
 
 
@@ -384,51 +384,51 @@ def logout_view(request):
     return redirect('login')
 
 
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+#####class UserViewSet(viewsets.ModelViewSet):
+#####    queryset = User.objects.all()
+#####    serializer_class = UserSerializer
+#####    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
-class UserRegisterView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserRegistrationSerializer
+#####class UserRegisterView(generics.CreateAPIView):
+#####    queryset = User.objects.all()
+#####    serializer_class = UserRegistrationSerializer
 
 
-class GenreViewSet(viewsets.ModelViewSet):
-    queryset = Genre.objects.all()
-    serializer_class = GenreSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+#####class GenreViewSet(viewsets.ModelViewSet):
+#####    queryset = Genre.objects.all()
+#####    serializer_class = GenreSerializer
+#####    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
-class ContentViewSet(viewsets.ModelViewSet):
-    queryset = Content.objects.all()
-    serializer_class = ContentSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+#####class ContentViewSet(viewsets.ModelViewSet):
+#####    queryset = Content.objects.all()
+#####    serializer_class = ContentSerializer
+#####    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
-class MovieViewSet(viewsets.ModelViewSet):
-    queryset = Movie.objects.all()
-    serializer_class = MovieSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+#####class MovieViewSet(viewsets.ModelViewSet):
+#####    queryset = Movie.objects.all()
+#####    serializer_class = MovieSerializer
+#####    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
-class SeriesViewSet(viewsets.ModelViewSet):
-    queryset = Series.objects.all()
-    serializer_class = SeriesSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+#####class SeriesViewSet(viewsets.ModelViewSet):
+#####    queryset = Series.objects.all()
+#####    serializer_class = SeriesSerializer
+#####    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
-class SeasonViewSet(viewsets.ModelViewSet):
-    queryset = Season.objects.all()
-    serializer_class = SeasonSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+#####class SeasonViewSet(viewsets.ModelViewSet):
+#####    queryset = Season.objects.all()
+#####    serializer_class = SeasonSerializer
+#####    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
-class EpisodeViewSet(viewsets.ModelViewSet):
-    queryset = Episode.objects.all()
-    serializer_class = EpisodeSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+#####class EpisodeViewSet(viewsets.ModelViewSet):
+#####    queryset = Episode.objects.all()
+#####    serializer_class = EpisodeSerializer
+#####    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 #class ReviewViewSet(viewsets.ModelViewSet):
@@ -445,45 +445,58 @@ class EpisodeViewSet(viewsets.ModelViewSet):
 #    def get_serializer_context(self):
 #        return {'request': self.request}
 
-class ReviewViewSet(viewsets.ModelViewSet):
-    queryset = Review.objects.all()
-    serializer_class = ReviewSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
-
-    def get_serializer_context(self):
-        return {'request': self.request}
-
-
-
-
-class ProtectedHelloView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        return Response({"message": f"Привет, {request.user.username}. Ты аутентифицирован!"})
+#####class ReviewViewSet(viewsets.ModelViewSet):
+#####    queryset = Review.objects.all()
+#####    serializer_class = ReviewSerializer
+#####    permission_classes = [IsAuthenticatedOrReadOnly]
+#####
+#####    def get_serializer_context(self):
+#####        return {'request': self.request}
 
 
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def user_info_view(request):
-    return Response({
-        'id': request.user.id,
-        'username': request.user.username,
-        'email': request.user.email
-    })
+#####class ProtectedHelloView(APIView):
+#####    permission_classes = [IsAuthenticated]
+#####
+#####    def get(self, request):
+#####        return Response({"message": f"Привет, {request.user.username}. Ты аутентифицирован!"})
 
 
 
-class ChangePasswordView(APIView):
-    permission_classes = [IsAuthenticated]
 
-    def post(self, request):
-        serializer = ChangePasswordSerializer(data=request.data, context={'request': request})
-        if serializer.is_valid():
-            user = request.user
-            user.set_password(serializer.validated_data['new_password'])
-            user.save()
-            return Response({'message': 'Пароль успешно изменён'}, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#####@api_view(['GET'])
+#####@permission_classes([IsAuthenticated])
+#####def user_info_view(request):
+#####    return Response({
+#####        'id': request.user.id,
+#####        'username': request.user.username,
+#####        'email': request.user.email
+#####    })
+
+
+
+
+#####class UserInfoView(APIView):
+#####    permission_classes = [IsAuthenticated]
+#####
+#####    def get(self, request):
+#####        return Response({
+#####            'id': request.user.id,
+#####            'username': request.user.username,
+#####            'email': request.user.email
+#####        })
+
+
+
+#####class ChangePasswordView(APIView):
+#####    permission_classes = [IsAuthenticated]
+#####
+#####    def post(self, request):
+#####        serializer = ChangePasswordSerializer(data=request.data, context={'request': request})
+#####        if serializer.is_valid():
+#####            user = request.user
+#####            user.set_password(serializer.validated_data['new_password'])
+#####            user.save()
+#####            return Response({'message': 'Пароль успешно изменён'}, status=status.HTTP_200_OK)
+#####        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
