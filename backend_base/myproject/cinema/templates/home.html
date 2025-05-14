@@ -115,12 +115,15 @@
 
 
 <div class="header-bar">
-        <div class="header-content">
-            <div class="username">{{ username }}</div>
-            <div class="user-avatar"></div>
-            <button id="logout-button">Выйти</button>
-        </div>
+    <div class="header-content">
+        <div class="username">{{ username }}</div>
+        <div class="user-avatar"></div>
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit">Выйти</button>
+        </form>
     </div>
+</div>
 
 
 

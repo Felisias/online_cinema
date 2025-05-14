@@ -23,7 +23,8 @@ from .views import (
     content_detail_view,
     add_review_view,
     user_info_view,
-    TokenBlacklistView
+    TokenBlacklistView,
+    logout_view
 )
 
 router = DefaultRouter()
@@ -50,6 +51,7 @@ urlpatterns = [
     # UI (шаблоны)
     path('', home_view, name='home'),
     path('login/', login_view, name='login'),
+    path('logout/', logout_view, name='logout'),
     path('register/', register_view, name='register'),
     path('content/<int:content_id>/', content_detail_view, name='content_detail'),
     path('content/<int:content_id>/review/', add_review_view, name='add_review'),

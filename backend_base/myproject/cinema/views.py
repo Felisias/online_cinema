@@ -367,6 +367,23 @@ class TokenBlacklistView(APIView):
         return Response(status=205)
 
 
+
+
+
+def logout_view(request):
+    refresh_token = request.session.get('refresh_token')
+
+    if refresh_token:
+        try:
+            response = requests.post('http://127.0.0.1:8000/api/logout/', json={'refresh': refresh_token})
+        except requests.exceptions.RequestException:
+            pass  # если API упал — просто продолжим logout
+
+    request.session.flush()
+
+    return redirect('login')
+
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
