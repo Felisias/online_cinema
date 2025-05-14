@@ -377,7 +377,7 @@ def logout_view(request):
         try:
             response = requests.post('http://127.0.0.1:8000/api/logout/', json={'refresh': refresh_token})
         except requests.exceptions.RequestException:
-            pass  # если API упал — просто продолжим logout
+            pass
 
     request.session.flush()
 
