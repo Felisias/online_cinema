@@ -1,3 +1,4 @@
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import (
@@ -135,3 +136,17 @@ class ChangePasswordSerializer(serializers.Serializer):
         if not user.check_password(value):
             raise serializers.ValidationError("Старый пароль неверен.")
         return value
+
+
+#class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+#    @classmethod
+#    def get_token(cls, user):
+#        token = super().get_token(user)  # Получаем стандартный токен
+#
+#        # Добавляем кастомные поля в токен
+#        token['user_id'] = user.id
+#        token['username'] = user.username
+#        token['email'] = user.email
+#        token['is_staff'] = user.is_staff
+#
+#        return token

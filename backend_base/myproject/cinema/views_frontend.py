@@ -303,7 +303,8 @@ def add_review_view(request, content_id):
 
         text = request.POST.get('text')
         rating = request.POST.get('rating')
-
+        id = request.POST.get('id')
+        print(id)
         try:
             review_data = {
                 'content': content_id,
